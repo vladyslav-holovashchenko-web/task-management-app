@@ -1,3 +1,5 @@
 import { FC } from 'react'
 
-export const Home: FC = () => <h1>Task Management Application</h1>
+const Home: FC = () => <h1>Task Management Application</h1>
+
+export default Home

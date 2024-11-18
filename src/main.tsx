@@ -1,13 +1,14 @@
-import { StrictMode } from 'react'
+import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { store } from './store'
 
 import './styles/index.css'
+import { Loading } from './components/Loading'
 
-import { Home } from './pages/Home'
-import { NotFound } from './pages/NotFound'
+const Home = lazy(() => import('./pages/Home'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 const routes = [
   { path: '/', element: <Home /> },
@@ -27,7 +28,9 @@ const router = createBrowserRouter(routes, {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} future={{ v7_startTransition: true }} />
+      <Suspense fallback={<Loading />}>
+        <RouterProvider router={router} future={{ v7_startTransition: true }} />
+      </Suspense>
     </Provider>
   </StrictMode>
 )

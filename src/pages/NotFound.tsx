@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { Button, Typography, Box } from '@mui/material'
 import { Link } from 'react-router-dom'
 
-export const NotFound: FC = () => {
+const NotFound: FC = () => {
   return (
     <Box
       display="flex"
@@ -41,3 +41,5 @@ export const NotFound: FC = () => {
     </Box>
   )
 }
+
+export default NotFound
