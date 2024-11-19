@@ -5,15 +5,15 @@ import { Provider } from 'react-redux'
 import { store } from './store'
 
 import './styles/index.css'
-import { Loading } from './components/Loading'
+import { Loading } from './components/ui/Loading'
 import { ThemeProvider } from '@mui/material'
 import theme from './styles/theme'
 
-const Home = lazy(() => import('./pages/Home'))
+const LandingPage = lazy(() => import('./pages/LandingPage'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 const routes = [
-  { path: '/', element: <Home /> },
+  { path: '/', element: <LandingPage /> },
   { path: '*', element: <NotFound /> },
 ]
 
