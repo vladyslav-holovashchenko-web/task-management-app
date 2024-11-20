@@ -11,9 +11,13 @@ import theme from './styles/theme'
 
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const NotFound = lazy(() => import('./pages/NotFound'))
+const LoginPage = lazy(() => import('./pages/Auth/Login'))
+const RegisterPage = lazy(() => import('./pages/Auth/Register'))
 
 const routes = [
   { path: '/', element: <LandingPage /> },
+  { path: '/login', element: <LoginPage /> },
+  { path: '/register', element: <RegisterPage /> },
   { path: '*', element: <NotFound /> },
 ]
 

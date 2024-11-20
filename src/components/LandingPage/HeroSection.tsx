@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import { Box, Typography, Button } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {
   title: string
@@ -8,6 +9,12 @@ interface Props {
 }
 
 const HeroSection: FC<Props> = ({ title, subtitle, buttonText }) => {
+  const navigate = useNavigate()
+
+  const handleButtonClick = () => {
+    navigate('/register')
+  }
+
   return (
     <Box
       sx={{
@@ -68,7 +75,7 @@ const HeroSection: FC<Props> = ({ title, subtitle, buttonText }) => {
       <Typography variant="h5" sx={{ mb: 4 }}>
         {subtitle}
       </Typography>
-      <Button variant="contained" color="secondary" size="large">
+      <Button variant="contained" color="secondary" size="large" onClick={handleButtonClick}>
         {buttonText}
       </Button>
 
