@@ -1,15 +1,45 @@
 import { FC, useState } from 'react'
 import { Box, TextField, Button, Typography, Link as MuiLink, Grid2 as Grid } from '@mui/material'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 
 const RegisterForm: FC = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log({ email, password, confirmPassword })
+
+    // Перевірка, чи паролі збігаються
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      setError('') // Очищаємо попередні помилки
+
+      // Надсилання POST запиту на сервер для реєстрації
+      const response = await axios.post('http://localhost:3000/users/register', {
+        email,
+        password,
+      })
+
+      console.log('Реєстрація успішна:', response.data)
+      // Ви можете перенаправити користувача на іншу сторінку після успішної реєстрації
+      // наприклад, на сторінку логіну:
+      // history.push('/login')
+    } catch (error) {
+      // Обробка помилок
+      setError('Не вдалося зареєструватися. Спробуйте ще раз.')
+    } finally {
+      setIsLoading(false)
+    }
+
     setEmail('')
     setPassword('')
     setConfirmPassword('')
@@ -63,9 +93,16 @@ const RegisterForm: FC = () => {
               required
             />
           </Grid>
+          {error && (
+            <Grid size={{ xs: 12 }}>
+              <Typography color="error" variant="body2" align="center">
+                {error}
+              </Typography>
+            </Grid>
+          )}
           <Grid size={{ xs: 12 }}>
-            <Button fullWidth type="submit" variant="contained" color="primary">
-              Register
+            <Button fullWidth type="submit" variant="contained" color="primary" disabled={isLoading}>
+              {isLoading ? 'Registering...' : 'Register'}
             </Button>
           </Grid>
         </Grid>
