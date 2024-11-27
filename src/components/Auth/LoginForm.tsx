@@ -2,16 +2,19 @@ import { FC, useState } from 'react'
 import { Box, TextField, Button, Typography, Link as MuiLink } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { Link } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '../../hooks/useStoreHooks'
+import { loginUser } from '../../features/auth/authSlice'
 
 const LoginForm: FC = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const dispatch = useAppDispatch()
+  const { isLoading, error } = useAppSelector((state) => state.auth)
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log({ email, password })
-    setEmail('')
-    setPassword('')
+    await dispatch(loginUser({ email, password }))
   }
 
   return (
@@ -51,9 +54,16 @@ const LoginForm: FC = () => {
               required
             />
           </Grid>
+          {error && (
+            <Grid size={{ xs: 12 }}>
+              <Typography color="error" variant="body2" align="center">
+                {error}
+              </Typography>
+            </Grid>
+          )}
           <Grid size={{ xs: 12 }}>
-            <Button fullWidth type="submit" variant="contained" color="primary">
-              Login
+            <Button fullWidth type="submit" variant="contained" color="primary" disabled={isLoading}>
+              {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </Grid>
         </Grid>

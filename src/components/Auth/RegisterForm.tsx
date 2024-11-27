@@ -1,48 +1,26 @@
 import { FC, useState } from 'react'
 import { Box, TextField, Button, Typography, Link as MuiLink, Grid2 as Grid } from '@mui/material'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
+import { useAppDispatch, useAppSelector } from '../../hooks/useStoreHooks'
+import { registerUser, resetError } from '../../features/auth/authSlice'
 
 const RegisterForm: FC = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const dispatch = useAppDispatch()
+  const { isLoading, error } = useAppSelector((state) => state.auth)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Перевірка, чи паролі збігаються
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
+      dispatch(resetError())
+      alert('Passwords do not match')
       return
     }
 
-    try {
-      setIsLoading(true)
-      setError('') // Очищаємо попередні помилки
-
-      // Надсилання POST запиту на сервер для реєстрації
-      const response = await axios.post('http://localhost:3000/users/register', {
-        email,
-        password,
-      })
-
-      console.log('Реєстрація успішна:', response.data)
-      // Ви можете перенаправити користувача на іншу сторінку після успішної реєстрації
-      // наприклад, на сторінку логіну:
-      // history.push('/login')
-    } catch (error) {
-      // Обробка помилок
-      setError('Не вдалося зареєструватися. Спробуйте ще раз.')
-    } finally {
-      setIsLoading(false)
-    }
-
-    setEmail('')
-    setPassword('')
-    setConfirmPassword('')
+    await dispatch(registerUser({ email, password }))
   }
 
   return (
