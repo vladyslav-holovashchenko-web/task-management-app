@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { Box, TextField, Button, Typography, Link as MuiLink } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom' // Import useNavigate
 import { useAppDispatch, useAppSelector } from '../../hooks/useStoreHooks'
 import { loginUser } from '../../features/auth/authSlice'
 
@@ -11,10 +11,15 @@ const LoginForm: FC = () => {
 
   const dispatch = useAppDispatch()
   const { isLoading, error } = useAppSelector((state) => state.auth)
+  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await dispatch(loginUser({ email, password }))
+    const resultAction = await dispatch(loginUser({ email, password }))
+
+    if (loginUser.fulfilled.match(resultAction)) {
+      navigate('/dashboard')
+    }
   }
 
   return (

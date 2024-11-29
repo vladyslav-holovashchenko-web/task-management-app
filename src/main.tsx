@@ -8,6 +8,7 @@ import './styles/index.css'
 import { Loading } from './components/ui/Loading'
 import { ThemeProvider } from '@mui/material'
 import theme from './styles/theme'
+import { PrivateRoute } from './components/layouts/PrivateRoute'
 
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const NotFound = lazy(() => import('./pages/NotFound'))
@@ -18,6 +19,14 @@ const routes = [
   { path: '/', element: <LandingPage /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
+  {
+    path: '/dashboard',
+    element: (
+      <PrivateRoute>
+        <h2>DashboardPage</h2>
+      </PrivateRoute>
+    ),
+  },
   { path: '*', element: <NotFound /> },
 ]
 
