@@ -1,24 +1,25 @@
 import { FC, useState } from 'react'
-import { Box, TextField, Button, Typography, Link as MuiLink } from '@mui/material'
-import Grid from '@mui/material/Grid2'
-import { Link, useNavigate } from 'react-router-dom' // Import useNavigate
+import { Box, TextField, Button, Typography, Link as MuiLink, Grid2 as Grid } from '@mui/material'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../hooks/useStoreHooks'
 import { loginUser } from '../../features/auth/authSlice'
 
 const LoginForm: FC = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-
   const dispatch = useAppDispatch()
   const { isLoading, error } = useAppSelector((state) => state.auth)
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const resultAction = await dispatch(loginUser({ email, password }))
 
-    if (loginUser.fulfilled.match(resultAction)) {
+    try {
+      const resultAction = await dispatch(loginUser({ email, password })).unwrap()
+      console.log('Login successful:', resultAction)
       navigate('/dashboard')
+    } catch (err) {
+      console.error('Login failed:', err)
     }
   }
 
@@ -42,6 +43,7 @@ const LoginForm: FC = () => {
             <TextField
               fullWidth
               label="Email"
+              type="email"
               variant="outlined"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

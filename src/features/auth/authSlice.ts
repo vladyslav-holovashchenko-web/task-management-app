@@ -2,11 +2,33 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { jwtDecode } from 'jwt-decode'
 
+export interface DecodedJWT {
+  email: string
+  sub: string
+  username: string
+  exp: number
+}
+
+export interface User {
+  email: string
+  id: string
+  username: string
+}
+
+export interface LoginUserDTO {
+  email: string
+  password: string
+}
+
+export interface RegisterUserDTO extends LoginUserDTO {
+  username: string
+}
+
 export interface AuthState {
   isLoading: boolean
   error: string | null
   isAuthenticated: boolean
-  user: { email: string; id: string } | null
+  user: User | null
   token: string | null
 }
 
@@ -17,6 +39,55 @@ const initialState: AuthState = {
   user: null,
   token: localStorage.getItem('access_token') || null,
 }
+
+export const registerUser = createAsyncThunk(
+  'auth/registerUser',
+  async ({ email, password, username }: RegisterUserDTO, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/auth/register', {
+        email,
+        password,
+        username,
+      })
+      const decodedToken = jwtDecode<DecodedJWT>(response.data.access_token)
+      localStorage.setItem('access_token', response.data.access_token)
+      return {
+        access_token: response.data.access_token,
+        user: {
+          email: decodedToken.email,
+          id: decodedToken.sub,
+          username: decodedToken.username,
+        },
+      }
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || 'Registration failed')
+    }
+  }
+)
+
+export const loginUser = createAsyncThunk(
+  'auth/loginUser',
+  async ({ email, password }: LoginUserDTO, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/auth/login', {
+        email,
+        password,
+      })
+      const decodedToken = await jwtDecode<DecodedJWT>(response.data.access_token)
+      localStorage.setItem('access_token', response.data.access_token)
+      return {
+        access_token: response.data.access_token,
+        user: {
+          email: decodedToken.email,
+          id: decodedToken.sub,
+          username: decodedToken.username,
+        },
+      }
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || 'Login failed')
+    }
+  }
+)
 
 const isTokenValid = (token: string | null): boolean => {
   if (!token) return false
@@ -31,11 +102,15 @@ const isTokenValid = (token: string | null): boolean => {
 export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { rejectWithValue }) => {
   try {
     const response = await axios.post('http://localhost:3000/auth/refresh', {}, { withCredentials: true })
-    const decodedToken = jwtDecode<{ email: string; sub: string }>(response.data.access_token)
+    const decodedToken = jwtDecode<DecodedJWT>(response.data.access_token)
     localStorage.setItem('access_token', response.data.access_token)
     return {
       access_token: response.data.access_token,
-      user: { email: decodedToken.email, id: decodedToken.sub },
+      user: {
+        email: decodedToken.email,
+        id: decodedToken.sub,
+        username: decodedToken.username,
+      },
     }
   } catch (err: any) {
     return rejectWithValue('Failed to refresh token')
@@ -45,30 +120,20 @@ export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { re
 export const initializeAuth = createAsyncThunk('auth/initializeAuth', async (_, { dispatch }) => {
   const token = localStorage.getItem('access_token')
   if (isTokenValid(token)) {
-    const decodedToken = jwtDecode<{ email: string; sub: string }>(token!)
-    return { token, user: { email: decodedToken.email, id: decodedToken.sub } }
+    const decodedToken = jwtDecode<DecodedJWT>(token!)
+    return {
+      token,
+      user: {
+        email: decodedToken.email,
+        id: decodedToken.sub,
+        username: decodedToken.username,
+      },
+    }
   } else {
     await dispatch(refreshToken())
     return null
   }
 })
-
-export const loginUser = createAsyncThunk(
-  'auth/loginUser',
-  async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
-    try {
-      const response = await axios.post('http://localhost:3000/auth/login', { email, password })
-      const decodedToken = jwtDecode<{ email: string; sub: string }>(response.data.access_token)
-      localStorage.setItem('access_token', response.data.access_token)
-      return {
-        access_token: response.data.access_token,
-        user: { email: decodedToken.email, id: decodedToken.sub },
-      }
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Login failed')
-    }
-  }
-)
 
 const authSlice = createSlice({
   name: 'auth',
@@ -86,6 +151,22 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Реєстрація
+      .addCase(registerUser.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isAuthenticated = true
+        state.user = action.payload.user
+        state.token = action.payload.access_token
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      // Логін
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true
         state.error = null
@@ -100,6 +181,7 @@ const authSlice = createSlice({
         state.isLoading = false
         state.error = action.payload as string
       })
+      // Оновлення токена
       .addCase(refreshToken.fulfilled, (state, action) => {
         state.isAuthenticated = true
         state.user = action.payload.user
@@ -110,6 +192,7 @@ const authSlice = createSlice({
         state.user = null
         state.token = null
       })
+      // Ініціалізація
       .addCase(initializeAuth.fulfilled, (state, action) => {
         if (action.payload) {
           state.isAuthenticated = true

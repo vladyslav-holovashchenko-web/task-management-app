@@ -2,25 +2,36 @@ import { FC, useState } from 'react'
 import { Box, TextField, Button, Typography, Link as MuiLink, Grid2 as Grid } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../hooks/useStoreHooks'
-import { registerUser, resetError } from '../../features/auth/authSlice'
+import { registerUser, RegisterUserDTO } from '../../features/auth/authSlice'
 
 const RegisterForm: FC = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [registerDTO, setRegisterDTO] = useState<RegisterUserDTO>({
+    username: '',
+    email: '',
+    password: '',
+  })
   const [confirmPassword, setConfirmPassword] = useState('')
   const dispatch = useAppDispatch()
   const { isLoading, error } = useAppSelector((state) => state.auth)
 
+  const handleInputChange = (field: keyof RegisterUserDTO, value: string) => {
+    setRegisterDTO((prev) => ({ ...prev, [field]: value }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (password !== confirmPassword) {
-      dispatch(resetError())
-      alert('Passwords do not match')
+    if (registerDTO.password !== confirmPassword) {
+      console.log('Passwords do not match')
       return
     }
 
-    await dispatch(registerUser({ email, password }))
+    try {
+      await dispatch(registerUser(registerDTO)).unwrap()
+      console.log('Registration successful')
+    } catch (err) {
+      console.error('Registration error:', err)
+    }
   }
 
   return (
@@ -42,10 +53,21 @@ const RegisterForm: FC = () => {
           <Grid size={{ xs: 12 }}>
             <TextField
               fullWidth
-              label="Email"
+              label="Username"
               variant="outlined"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={registerDTO.username}
+              onChange={(e) => handleInputChange('username', e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <TextField
+              fullWidth
+              label="Email"
+              type="email"
+              variant="outlined"
+              value={registerDTO.email}
+              onChange={(e) => handleInputChange('email', e.target.value)}
               required
             />
           </Grid>
@@ -55,8 +77,8 @@ const RegisterForm: FC = () => {
               label="Password"
               type="password"
               variant="outlined"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={registerDTO.password}
+              onChange={(e) => handleInputChange('password', e.target.value)}
               required
             />
           </Grid>
