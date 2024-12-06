@@ -151,7 +151,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Реєстрація
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true
         state.error = null
@@ -166,7 +165,6 @@ const authSlice = createSlice({
         state.isLoading = false
         state.error = action.payload as string
       })
-      // Логін
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true
         state.error = null
@@ -181,7 +179,6 @@ const authSlice = createSlice({
         state.isLoading = false
         state.error = action.payload as string
       })
-      // Оновлення токена
       .addCase(refreshToken.fulfilled, (state, action) => {
         state.isAuthenticated = true
         state.user = action.payload.user
@@ -192,7 +189,6 @@ const authSlice = createSlice({
         state.user = null
         state.token = null
       })
-      // Ініціалізація
       .addCase(initializeAuth.fulfilled, (state, action) => {
         if (action.payload) {
           state.isAuthenticated = true

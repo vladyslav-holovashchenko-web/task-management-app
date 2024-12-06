@@ -19,23 +19,33 @@ const tasksSlice = createSlice({
   initialState,
   reducers: {
     addTask: (state, action: PayloadAction<{ id: string; title: string }>) => {
-      // todo:
+      state.tasks.push({
+        id: action.payload.id,
+        title: action.payload.title,
+        completed: false,
+      })
     },
 
     toggleTask: (state, action: PayloadAction<string>) => {
-      // todo:
+      const task = state.tasks.find((task) => task.id === action.payload)
+      if (task) {
+        task.completed = !task.completed
+      }
     },
 
     updateTaskTitle: (state, action: PayloadAction<{ id: string; title: string }>) => {
-      // todo:
+      const task = state.tasks.find((task) => task.id === action.payload.id)
+      if (task) {
+        task.title = action.payload.title
+      }
     },
 
     deleteTask: (state, action: PayloadAction<string>) => {
-      // todo:
+      state.tasks = state.tasks.filter((task) => task.id !== action.payload)
     },
 
     deleteCompletedTasks: (state) => {
-      // todo:
+      state.tasks = state.tasks.filter((task) => !task.completed)
     },
   },
 })
