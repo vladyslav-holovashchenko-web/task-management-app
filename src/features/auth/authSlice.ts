@@ -35,9 +35,10 @@ export interface AuthState {
 const initialState: AuthState = {
   isLoading: false,
   error: null,
-  isAuthenticated: false,
-  user: null,
-  token: localStorage.getItem('access_token') || null,
+  isAuthenticated: true,
+  user: { username: 'null', email: 'mail', id: '1' },
+  token: '',
+  // token: localStorage.getItem('access_token') || null,
 }
 
 export const registerUser = createAsyncThunk(

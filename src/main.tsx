@@ -9,6 +9,7 @@ import { Loading } from './components/ui/Loading'
 import { ThemeProvider } from '@mui/material'
 import theme from './styles/theme'
 import { PrivateRoute } from './components/layouts/PrivateRoute'
+import { Dashboard } from './pages/Dashboard'
 
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const NotFound = lazy(() => import('./pages/NotFound'))
@@ -23,7 +24,7 @@ const routes = [
     path: '/dashboard',
     element: (
       <PrivateRoute>
-        <h2>DashboardPage</h2>
+        <Dashboard />
       </PrivateRoute>
     ),
   },
