@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { fetchTasks, fetchTeams, fetchTaskBoards } from './actions'
 
 interface Task {
   id: string
@@ -83,6 +84,51 @@ const tasksSlice = createSlice({
     setError: (state, action: PayloadAction<string>) => {
       state.error = action.payload
     },
+
+    clearError: (state) => {
+      state.error = null
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTasks.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchTasks.fulfilled, (state, action) => {
+        state.loading = false
+        state.tasks = action.payload
+      })
+      .addCase(fetchTasks.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+
+      .addCase(fetchTeams.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchTeams.fulfilled, (state, action) => {
+        state.loading = false
+        state.teams = action.payload
+      })
+      .addCase(fetchTeams.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+
+      .addCase(fetchTaskBoards.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchTaskBoards.fulfilled, (state, action) => {
+        state.loading = false
+        state.taskBoards = action.payload
+      })
+      .addCase(fetchTaskBoards.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
   },
 })
 
@@ -97,6 +143,7 @@ export const {
   setTasks,
   setLoading,
   setError,
+  clearError,
 } = tasksSlice.actions
 
 export default tasksSlice.reducer
