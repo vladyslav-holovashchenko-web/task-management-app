@@ -1,29 +1,12 @@
 import { Box } from '@mui/material'
 import { Boards } from '../components/Dashboard/Boards'
 import { Teams } from '../components/Dashboard/Teams'
-import { Header } from '../components/Header/Header'
+import { ITaskBoard, ITeam } from '../interfaces'
+import { boardsData, teamsData } from '../fakeData'
 
-export interface ITaskBoard {
-  id: string
-  title: string
-  team: string
-}
-
-export interface ITeam {
-  id: string
-  name: string
-}
 export const Dashboard = () => {
-  const taskBoards: ITaskBoard[] = [
-    { id: '1', title: 'Personal Tasks', team: 'Personal' },
-    { id: '2', title: 'Work Project', team: 'Development Team' },
-    { id: '3', title: 'Shopping List', team: 'Marketing Team' },
-  ]
-
-  const teams: ITeam[] = [
-    { id: '1', name: 'Development Team' },
-    { id: '2', name: 'Marketing Team' },
-  ]
+  const taskBoards: ITaskBoard[] = boardsData
+  const teams: ITeam[] = teamsData
 
   return (
     <Box sx={{ p: 3 }}>

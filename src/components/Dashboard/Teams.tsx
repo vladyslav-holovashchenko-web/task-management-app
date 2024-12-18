@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { Typography, Grid2 as Grid, Card, CardContent, CardActions, Button } from '@mui/material'
 import { Link } from 'react-router-dom'
-import { ITeam } from '../../pages/Dashboard'
+import { ITeam } from '../../interfaces'
 
 type Props = {
   teams: ITeam[]

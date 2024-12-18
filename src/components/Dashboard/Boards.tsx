@@ -1,7 +1,7 @@
 import { Typography, Grid2 as Grid, Card, CardContent, CardActions, Button } from '@mui/material'
 import { FC } from 'react'
 import { Link } from 'react-router-dom'
-import { ITaskBoard } from '../../pages/Dashboard'
+import { ITaskBoard } from '../../interfaces'
 
 type Props = {
   taskBoards: ITaskBoard[]
