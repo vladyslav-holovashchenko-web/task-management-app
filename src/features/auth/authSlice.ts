@@ -36,7 +36,7 @@ const initialState: AuthState = {
   isLoading: false,
   error: null,
   isAuthenticated: true,
-  user: { username: 'null', email: 'mail', id: '1' },
+  user: { username: 'test', email: 'mail', id: '1' },
   token: '',
   // token: localStorage.getItem('access_token') || null,
 }
