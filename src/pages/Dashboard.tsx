@@ -27,7 +27,6 @@ export const Dashboard = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Header />
       <Boards taskBoards={taskBoards} />
       <Teams teams={teams} />
     </Box>
