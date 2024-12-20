@@ -7,6 +7,7 @@ export interface ITask {
   status: string
   assignedTo: string
   boardId: string
+  completed: boolean
 }
 export interface ITaskBoard {
   id: string

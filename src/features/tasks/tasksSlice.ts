@@ -1,28 +1,11 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit'
 import { fetchTasks, fetchTeams, fetchTaskBoards } from './actions'
-
-interface Task {
-  id: string
-  title: string
-  completed: boolean
-  boardId: string
-  teamId: string
-}
-
-interface TaskBoard {
-  id: string
-  title: string
-}
-
-interface Team {
-  id: string
-  name: string
-}
+import { ITask, ITaskBoard, ITeam } from '../../interfaces'
 
 interface TasksState {
-  tasks: Task[]
-  taskBoards: TaskBoard[]
-  teams: Team[]
+  tasks: ITask[]
+  taskBoards: ITaskBoard[]
+  teams: ITeam[]
   loading: boolean
   error: string | null
 }
@@ -35,11 +18,21 @@ const initialState: TasksState = {
   error: null,
 }
 
+const handlePending = (state: TasksState) => {
+  state.loading = true
+  state.error = null
+}
+
+const handleRejected = (state: TasksState, action: PayloadAction<unknown, string, any, SerializedError>) => {
+  state.loading = false
+  state.error = action.payload ? String(action.payload) : action.error?.message || 'An unexpected error occurred'
+}
+
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    addTask: (state, action: PayloadAction<Task>) => {
+    addTask: (state, action: PayloadAction<ITask>) => {
       state.tasks.push(action.payload)
     },
 
@@ -65,24 +58,16 @@ const tasksSlice = createSlice({
       state.tasks = state.tasks.filter((task) => !task.completed)
     },
 
-    setTaskBoards: (state, action: PayloadAction<TaskBoard[]>) => {
+    setTaskBoards: (state, action: PayloadAction<ITaskBoard[]>) => {
       state.taskBoards = action.payload
     },
 
-    setTeams: (state, action: PayloadAction<Team[]>) => {
+    setTeams: (state, action: PayloadAction<ITeam[]>) => {
       state.teams = action.payload
     },
 
-    setTasks: (state, action: PayloadAction<Task[]>) => {
+    setTasks: (state, action: PayloadAction<ITask[]>) => {
       state.tasks = action.payload
-    },
-
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload
-    },
-
-    setError: (state, action: PayloadAction<string>) => {
-      state.error = action.payload
     },
 
     clearError: (state) => {
@@ -91,44 +76,26 @@ const tasksSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTasks.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
+      .addCase(fetchTasks.pending, handlePending)
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.loading = false
         state.tasks = action.payload
       })
-      .addCase(fetchTasks.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload as string
-      })
+      .addCase(fetchTasks.rejected, handleRejected)
 
-      .addCase(fetchTeams.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
+      .addCase(fetchTeams.pending, handlePending)
       .addCase(fetchTeams.fulfilled, (state, action) => {
         state.loading = false
         state.teams = action.payload
       })
-      .addCase(fetchTeams.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload as string
-      })
+      .addCase(fetchTeams.rejected, handleRejected)
 
-      .addCase(fetchTaskBoards.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
+      .addCase(fetchTaskBoards.pending, handlePending)
       .addCase(fetchTaskBoards.fulfilled, (state, action) => {
         state.loading = false
         state.taskBoards = action.payload
       })
-      .addCase(fetchTaskBoards.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload as string
-      })
+      .addCase(fetchTaskBoards.rejected, handleRejected)
   },
 })
 
@@ -141,8 +108,6 @@ export const {
   setTaskBoards,
   setTeams,
   setTasks,
-  setLoading,
-  setError,
   clearError,
 } = tasksSlice.actions
 
